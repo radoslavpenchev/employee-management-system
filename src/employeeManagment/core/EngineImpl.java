@@ -5,79 +5,78 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
 
-public class EngineImpl implements Engine{
+public class EngineImpl implements Engine {
 
-private Controller controller;
-private BufferedReader reader;
+    private Controller controller;
+    private BufferedReader reader;
 
-public EngineImpl (Controller controller){
-    this.controller = controller;
-    this.reader = new BufferedReader(new InputStreamReader(System.in));
-}
+    public EngineImpl(Controller controller) {
+        this.controller = controller;
+        this.reader = new BufferedReader(new InputStreamReader(System.in));
+    }
 
     //Implementation of run() command
-     @Override
+    @Override
     public void run() {
-    while (true){
-        String result = null;
-        try {
-            result = processInput();
+        while (true) {
+            String result = null;
+            try {
+                result = processInput();
 
-            if (result.equals("Exit")){
-                break;
+                if (result.equals("Exit")) {
+                    break;
+                }
+            } catch (NullPointerException | IllegalArgumentException | IOException e) {
+                result = e.getMessage();
             }
-        }catch (NullPointerException | IllegalArgumentException | IOException e){
-            result=e.getMessage();
+            System.out.println(result);
         }
-        System.out.println(result);
-    }
     }
 
     //Reading, Validating and Processing input
     private String processInput() throws IOException {
-    List<String> dataTuple = parseInput(reader);
+        List<String> dataTuple = parseInput(reader);
 
-    validateArgsLength(dataTuple);
+        String command = dataTuple.get(0);
+        dataTuple.remove(0);
 
-    String command = dataTuple.get(0);
-
-    return dispatchCommand(command, dataTuple);
+        return dispatchCommand(command, dataTuple);
 
     }
 
     //CREATE
-    private String create(String id, String name, int age, double salary){
+    private String create(String id, String name, int age, double salary) {
         return controller.create(id, name, age, salary);
     }
 
     //GET EMPLOYEE
-    private String get(String id){
-    return controller.get(id);
+    private String get(String id) {
+        return controller.get(id);
     }
 
     //DELETE
-    private String delete(String id){
-    return controller.delete(id);
+    private String delete(String id) {
+        return controller.delete(id);
     }
 
     //UPDATE
-    private String update(String id, String name, int age, double salary){
+    private String update(String id, String name, int age, double salary) {
         return controller.update(id, name, age, salary);
     }
 
     //GET EMPLOYEES
-    private String getEmployees(){
-    return controller.getEmployees();
+    private String getEmployees() {
+        return controller.getEmployees();
     }
 
     //LOAD to csv
-    private String load(String fileName){
-    return controller.load(fileName);
+    private String load(String fileName) {
+        return controller.load(fileName);
     }
 
     //SAVE to csv
-    private String save(String fileName){
-    return controller.save(fileName);
+    private String save(String fileName) {
+        return controller.save(fileName);
     }
 
     //Reading input
@@ -86,49 +85,29 @@ public EngineImpl (Controller controller){
         String[] tokens = input.split("\\s+");
 
 
-        return Collections.unmodifiableList(Arrays.stream(tokens).toList());
+        return Arrays.stream(tokens).toList();
 
     }
 
     //Validating arguments count
-    private void validateArgsLength(List<String> input){
+    private void validateArgsLength(int limit, List<String> args) {
 
-    if (input.get(0).equals("load") || input.get(0).equals("save") || input.get(0).equals("delete")){
-        input.remove(0);
-
-        if (input.size()!=2){
+        if (args.size() != limit){
             throw new IllegalArgumentException("Invalid number of arguments!");
-        }
-    }else if (input.get(0).equals("update") || input.get(0).equals("create")){
-        input.remove(0);
 
-        if (input.size()!=5){
-            throw new IllegalArgumentException("Invalid number of arguments!");
-        }
-    }else if (input.get(0).equals("get")){
-        input.remove(0);
-
-        if (input.get(0).equals("employee")){
-            if (input.size()!=2){
-                throw new IllegalArgumentException("Invalid number of arguments!");
-            }
-        }else if (input.get(0).equals("employees")){
-            if (input.size()!=1){
-                throw new IllegalArgumentException("Invalid number of arguments!");
-            }
         }
     }
-    }
+
 
     //Processing command with arguments
-    private String dispatchCommand(String command, List<String> data){
+    private String dispatchCommand(String command, List<String> data) {
 
-    String result = null;
+        String result = null;
 
-    data.remove(0);
-
-        switch (command){
+        switch (command) {
             case "create":
+                validateArgsLength(5, data);
+
                 String id = data.get(1);
                 String name = data.get(2);
                 int age = Integer.parseInt(data.get(3));
@@ -140,21 +119,29 @@ public EngineImpl (Controller controller){
             case "get":
 
                 if (data.get(0).equals("employee")) {
+                    validateArgsLength(2, data);
+
                     String idToAccess = data.get(1);
                     result = get(idToAccess);
 
                 } else if (data.get(0).equals("employees")) {
+                    validateArgsLength(1, data);
 
                     result = getEmployees();
                 }
                 break;
 
             case "delete":
+                validateArgsLength(2, data);
+
                 String idToDelete = data.get(1);
-                result= delete(idToDelete);
+                
+                result = delete(idToDelete);
                 break;
 
             case "update":
+                validateArgsLength(5, data);
+
                 String idToUpdate = data.get(1);
                 String nameToUpdate = data.get(2);
                 int ageToUpdate = Integer.parseInt(data.get(3));
@@ -164,12 +151,16 @@ public EngineImpl (Controller controller){
                 break;
 
             case "load":
+                validateArgsLength(2, data);
+
                 String loadingFileName = data.get(1);
 
                 result = load(loadingFileName);
                 break;
 
             case "save":
+                validateArgsLength(2, data);
+
                 String savingFileName = data.get(1);
                 result = save(savingFileName);
                 break;
