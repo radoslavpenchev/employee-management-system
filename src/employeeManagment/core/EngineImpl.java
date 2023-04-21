@@ -1,5 +1,7 @@
 package employeeManagment.core;
 
+import employeeManagment.additional.StringListPair;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,165 +9,179 @@ import java.util.*;
 
 public class EngineImpl implements Engine {
 
-    private Controller controller;
-    private BufferedReader reader;
+  private Controller controller;
+  private BufferedReader reader;
 
-    public EngineImpl(Controller controller) {
-        this.controller = controller;
-        this.reader = new BufferedReader(new InputStreamReader(System.in));
-    }
+  public EngineImpl(Controller controller) {
+    this.controller = controller;
+    this.reader = new BufferedReader(new InputStreamReader(System.in));
+  }
 
-    //Implementation of run() command
-    @Override
-    public void run() {
-        while (true) {
-            String result = null;
-            try {
-                result = processInput();
+  // Implementation of run() command
+  @Override
+  public void run() {
+    while (true) {
+      String result = null;
+      try {
+        result = processInput();
 
-                if (result.equals("Exit")) {
-                    break;
-                }
-            } catch (NullPointerException | IllegalArgumentException | IOException e) {
-                result = e.getMessage();
-            }
-            System.out.println(result);
+        if (result.equals("Exit")) {
+          break;
         }
+      } catch (NullPointerException | IllegalArgumentException | IOException e) {
+        result = e.getMessage();
+      }
+      System.out.println(result);
     }
+  }
 
-    //Reading, Validating and Processing input
-    private String processInput() throws IOException {
-        List<String> dataTuple = parseInput(reader);
+  // Reading, Validating and Processing input
+  private String processInput() throws IOException {
+    StringListPair dataTuple = parseInput(reader);
+    return dispatchCommand(dataTuple.getStr(), dataTuple.getList());
+  }
 
-        String command = dataTuple.get(0);
-        dataTuple.remove(0);
+  // CREATE
+  private String create(String id, String name, int age, double salary) {
+    return controller.create(id, name, age, salary);
+  }
 
-        return dispatchCommand(command, dataTuple);
+  // GET EMPLOYEE
+  private String get(String id) {
+    return controller.get(id);
+  }
 
+  // DELETE
+  private String delete(String id) {
+    return controller.delete(id);
+  }
+
+  // UPDATE
+  private String update(String id, String name, int age, double salary) {
+    return controller.update(id, name, age, salary);
+  }
+
+  // GET EMPLOYEES
+  private String getEmployees() {
+    return controller.getEmployees();
+  }
+
+  // LOAD to csv
+  private String load(String fileName) {
+    return controller.load(fileName);
+  }
+
+  // SAVE to csv
+  private String save(String fileName) {
+    return controller.save(fileName);
+  }
+
+  // Reading input
+  private StringListPair parseInput(BufferedReader reader) throws IOException {
+    String input = reader.readLine();
+    List<String> arguments = Arrays.stream(input.split("\\s+")).toList();
+    String command = arguments.get(0);
+    arguments.remove(0);
+    return new StringListPair(command, arguments);
+  }
+
+  // Validating arguments count
+  private boolean validateArgsLength(int limit, List<String> arguments) {
+    if (arguments.size() != limit) {
+      throw new IllegalArgumentException("Invalid number of arguments!");
     }
+    return true;
+  }
 
-    //CREATE
-    private String create(String id, String name, int age, double salary) {
-        return controller.create(id, name, age, salary);
+  // Processing command with arguments
+  private String dispatchCommand(String command, List<String> arguments) {
+    String result = null;
+    switch (command) {
+      case "create":
+        result = executeCommandCreate(arguments);
+        break;
+      case "get":
+        result = executeCommandGet(arguments);
+        break;
+      case "delete":
+        result = executeCommandDelete(arguments);
+        break;
+      case "update":
+        result = executeCommandUpdate(arguments);
+        break;
+      case "load":
+        result = executeCommandLoad(arguments);
+        break;
+      case "save":
+        result = executeCommandSave(arguments);
+        break;
     }
+    return result;
+  }
 
-    //GET EMPLOYEE
-    private String get(String id) {
-        return controller.get(id);
+  private String executeCommandCreate(List<String> arguments) {
+    String result = null;
+    if (validateArgsLength(5, arguments)) {
+      String id = arguments.get(1);
+      String name = arguments.get(2);
+      int age = Integer.parseInt(arguments.get(3));
+      double salary = Double.parseDouble(arguments.get(4));
+      result = create(id, name, age, salary);
     }
+    return result;
+  }
 
-    //DELETE
-    private String delete(String id) {
-        return controller.delete(id);
+  private String executeCommandGet(List<String> arguments) {
+    String result = null;
+    if (arguments.get(0).equals("employee")) {
+      if (validateArgsLength(2, arguments)) {
+        String idToAccess = arguments.get(1);
+        result = get(idToAccess);
+      }
+    } else if (arguments.get(0).equals("employees")) {
+      if (validateArgsLength(1, arguments)) {
+        result = getEmployees();
+      }
     }
+    return result;
+  }
 
-    //UPDATE
-    private String update(String id, String name, int age, double salary) {
-        return controller.update(id, name, age, salary);
+  private String executeCommandDelete(List<String> arguments) {
+    String result = null;
+    if (validateArgsLength(2, arguments)) {
+      String idToDelete = arguments.get(1);
+      result = delete(idToDelete);
     }
+    return result;
+  }
 
-    //GET EMPLOYEES
-    private String getEmployees() {
-        return controller.getEmployees();
+  private String executeCommandUpdate(List<String> arguments) {
+    String result = null;
+    if (validateArgsLength(5, arguments)) {
+      String idToUpdate = arguments.get(1);
+      String nameToUpdate = arguments.get(2);
+      int ageToUpdate = Integer.parseInt(arguments.get(3));
+      double salaryToUpdate = Double.parseDouble(arguments.get(4));
+      result = update(idToUpdate, nameToUpdate, ageToUpdate, salaryToUpdate);
     }
+    return result;
+  }
 
-    //LOAD to csv
-    private String load(String fileName) {
-        return controller.load(fileName);
+  private String executeCommandLoad(List<String> arguments) {
+    String result = null;
+    if (validateArgsLength(2, arguments)) {
+      String loadingFileName = arguments.get(1);
+      result = load(loadingFileName);
     }
+    return result;
+  }
 
-    //SAVE to csv
-    private String save(String fileName) {
-        return controller.save(fileName);
+  private String executeCommandSave(List<String> arguments) {
+    String result = null;
+    if (validateArgsLength(2, arguments)) {
+      String savingFileName = arguments.get(1);
+      result = save(savingFileName);
     }
-
-    //Reading input
-    private List<String> parseInput(BufferedReader reader) throws IOException {
-        String input = reader.readLine();
-        String[] tokens = input.split("\\s+");
-
-
-        return Arrays.stream(tokens).toList();
-
-    }
-
-    //Validating arguments count
-    private void validateArgsLength(int limit, List<String> args) {
-
-        if (args.size() != limit){
-            throw new IllegalArgumentException("Invalid number of arguments!");
-
-        }
-    }
-
-
-    //Processing command with arguments
-    private String dispatchCommand(String command, List<String> data) {
-
-        String result = null;
-
-        switch (command) {
-            case "create":
-                validateArgsLength(5, data);
-
-                String id = data.get(1);
-                String name = data.get(2);
-                int age = Integer.parseInt(data.get(3));
-                double salary = Double.parseDouble(data.get(4));
-
-                result = create(id, name, age, salary);
-                break;
-
-            case "get":
-
-                if (data.get(0).equals("employee")) {
-                    validateArgsLength(2, data);
-
-                    String idToAccess = data.get(1);
-                    result = get(idToAccess);
-
-                } else if (data.get(0).equals("employees")) {
-                    validateArgsLength(1, data);
-
-                    result = getEmployees();
-                }
-                break;
-
-            case "delete":
-                validateArgsLength(2, data);
-
-                String idToDelete = data.get(1);
-                
-                result = delete(idToDelete);
-                break;
-
-            case "update":
-                validateArgsLength(5, data);
-
-                String idToUpdate = data.get(1);
-                String nameToUpdate = data.get(2);
-                int ageToUpdate = Integer.parseInt(data.get(3));
-                double salaryToUpdate = Double.parseDouble(data.get(4));
-
-                result = update(idToUpdate, nameToUpdate, ageToUpdate, salaryToUpdate);
-                break;
-
-            case "load":
-                validateArgsLength(2, data);
-
-                String loadingFileName = data.get(1);
-
-                result = load(loadingFileName);
-                break;
-
-            case "save":
-                validateArgsLength(2, data);
-
-                String savingFileName = data.get(1);
-                result = save(savingFileName);
-                break;
-        }
-        return result;
-    }
-
+    return result;
+  }
 }

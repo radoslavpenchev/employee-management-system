@@ -14,11 +14,9 @@ public abstract class BaseEmployee implements EmployeeInterface{
         setSalary(salary);
     }
 
-    private void setId(String id){
-        if (Integer.parseInt(id)<0){
-            throw new IllegalArgumentException("ID cannot be negative!");
-        }
-        this.id=id;
+    @Override
+    public String getName() {
+        return this.name;
     }
 
     private void setName(String name){
@@ -28,11 +26,21 @@ public abstract class BaseEmployee implements EmployeeInterface{
         this.name=name;
     }
 
+    @Override
+    public int getAge() {
+        return this.age;
+    }
+
     private void setAge(int age){
         if (age<=0){
             throw new IllegalArgumentException("Age cannot be negative ot zero!");
         }
         this.age=age;
+    }
+
+    @Override
+    public double getSalary() {
+        return this.salary;
     }
 
     private void setSalary(double salary){
@@ -43,22 +51,14 @@ public abstract class BaseEmployee implements EmployeeInterface{
     }
 
     @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public int getAge() {
-        return this.age;
-    }
-
-    @Override
-    public double getSalary() {
-        return this.salary;
-    }
-
-    @Override
     public String getId() {
         return this.id;
+    }
+
+    private void setId(String id){
+        if (Integer.parseInt(id)<0){
+            throw new IllegalArgumentException("ID cannot be negative!");
+        }
+        this.id=id;
     }
 }
