@@ -1,11 +1,10 @@
 package employeeManagment.core;
 
-import employeeManagment.additional.StringListPair;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class EngineImpl implements Engine {
 
@@ -37,8 +36,8 @@ public class EngineImpl implements Engine {
 
   // Reading, Validating and Processing input
   private String processInput() throws IOException {
-    StringListPair dataTuple = parseInput(reader);
-    return dispatchCommand(dataTuple.getStr(), dataTuple.getList());
+    Pair<String, List<String>> pair = parseInput(reader);
+    return dispatchCommand(pair.getLeft(), pair.getRight());
   }
 
   // CREATE
@@ -76,13 +75,28 @@ public class EngineImpl implements Engine {
     return controller.save(fileName);
   }
 
-  // Reading input
-  private StringListPair parseInput(BufferedReader reader) throws IOException {
+  private Pair<String, List<String>> parseInput(BufferedReader reader) throws IOException {
     String input = reader.readLine();
     List<String> arguments = Arrays.stream(input.split("\\s+")).toList();
     String command = arguments.get(0);
     arguments.remove(0);
-    return new StringListPair(command, arguments);
+
+    return new Pair<>() {
+      @Override
+      public List<String> setValue(List<String> value) {
+        return arguments;
+      }
+
+      @Override
+      public String getLeft() {
+        return command;
+      }
+
+      @Override
+      public List<String> getRight() {
+        return arguments;
+      }
+    };
   }
 
   // Validating arguments count
@@ -95,28 +109,22 @@ public class EngineImpl implements Engine {
 
   // Processing command with arguments
   private String dispatchCommand(String command, List<String> arguments) {
-    String result = null;
     switch (command) {
       case "create":
-        result = executeCommandCreate(arguments);
-        break;
+        return executeCommandCreate(arguments);
       case "get":
-        result = executeCommandGet(arguments);
-        break;
+        return executeCommandGet(arguments);
       case "delete":
-        result = executeCommandDelete(arguments);
-        break;
+        return executeCommandDelete(arguments);
       case "update":
-        result = executeCommandUpdate(arguments);
-        break;
+        return executeCommandUpdate(arguments);
       case "load":
-        result = executeCommandLoad(arguments);
-        break;
+        return executeCommandLoad(arguments);
       case "save":
-        result = executeCommandSave(arguments);
-        break;
+        return executeCommandSave(arguments);
+      default:
+        throw new IllegalArgumentException("Invalid command!");
     }
-    return result;
   }
 
   private String executeCommandCreate(List<String> arguments) {
