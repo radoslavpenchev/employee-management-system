@@ -1,10 +1,11 @@
 package employeeManagment.core;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
-import org.apache.commons.lang3.tuple.Pair;
 
 public class EngineImpl implements Engine {
 
@@ -80,23 +81,7 @@ public class EngineImpl implements Engine {
     List<String> arguments = Arrays.stream(input.split("\\s+")).toList();
     String command = arguments.get(0);
     arguments.remove(0);
-
-    return new Pair<>() {
-      @Override
-      public List<String> setValue(List<String> value) {
-        return arguments;
-      }
-
-      @Override
-      public String getLeft() {
-        return command;
-      }
-
-      @Override
-      public List<String> getRight() {
-        return arguments;
-      }
-    };
+    return Pair.of(command, arguments);
   }
 
   // Validating arguments count
