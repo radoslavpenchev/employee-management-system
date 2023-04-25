@@ -1,11 +1,11 @@
 package employeeManagment.core;
 
-import org.apache.commons.lang3.tuple.Pair;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class EngineImpl implements Engine {
 
@@ -28,7 +28,7 @@ public class EngineImpl implements Engine {
         if (result.equals("Exit")) {
           break;
         }
-      } catch (NullPointerException | IllegalArgumentException | IOException e) {
+      } catch (NullPointerException | IllegalArgumentException | IllegalStateException | IOException e) {
         result = e.getMessage();
       }
       System.out.println(result);
@@ -67,18 +67,18 @@ public class EngineImpl implements Engine {
   }
 
   // LOAD to csv
-  private String load(String fileName) {
+  private String load(String fileName) throws IOException {
     return controller.load(fileName);
   }
 
   // SAVE to csv
-  private String save(String fileName) {
+  private String save(String fileName) throws IOException {
     return controller.save(fileName);
   }
 
   private Pair<String, List<String>> parseInput(BufferedReader reader) throws IOException {
     String input = reader.readLine();
-    List<String> arguments = Arrays.stream(input.split("\\s+")).toList();
+    List<String> arguments = Arrays.stream(input.split("\\s+")).collect(Collectors.toList());
     String command = arguments.get(0);
     arguments.remove(0);
     return Pair.of(command, arguments);
@@ -93,7 +93,7 @@ public class EngineImpl implements Engine {
   }
 
   // Processing command with arguments
-  private String dispatchCommand(String command, List<String> arguments) {
+  private String dispatchCommand(String command, List<String> arguments) throws IOException {
     switch (command) {
       case "create":
         return executeCommandCreate(arguments);
@@ -107,6 +107,8 @@ public class EngineImpl implements Engine {
         return executeCommandLoad(arguments);
       case "save":
         return executeCommandSave(arguments);
+      case "Exit":
+        return executeCommandExit();
       default:
         throw new IllegalArgumentException("Invalid command!");
     }
@@ -160,7 +162,7 @@ public class EngineImpl implements Engine {
     return result;
   }
 
-  private String executeCommandLoad(List<String> arguments) {
+  private String executeCommandLoad(List<String> arguments) throws IOException {
     String result = null;
     if (validateArgsLength(2, arguments)) {
       String loadingFileName = arguments.get(1);
@@ -169,12 +171,15 @@ public class EngineImpl implements Engine {
     return result;
   }
 
-  private String executeCommandSave(List<String> arguments) {
+  private String executeCommandSave(List<String> arguments) throws IOException {
     String result = null;
     if (validateArgsLength(2, arguments)) {
       String savingFileName = arguments.get(1);
       result = save(savingFileName);
     }
     return result;
+  }
+  private String executeCommandExit(){
+    return "Exit";
   }
 }

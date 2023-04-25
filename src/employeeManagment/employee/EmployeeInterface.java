@@ -10,4 +10,5 @@ public interface EmployeeInterface {
     String getId();
 
 
+    void update(String name, int age, double salary);
 }

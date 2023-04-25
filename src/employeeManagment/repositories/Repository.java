@@ -2,7 +2,7 @@ package employeeManagment.repositories;
 
 import java.util.Map;
 
-public interface Repository<T> {
+public interface Repository<T>{
 Map<String, T> getCollection();
     void add(String id,T entity);
 

@@ -1,5 +1,8 @@
 package employeeManagment.core;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 public interface Controller {
 String create(String id, String name, int age, double salary);
 
@@ -11,7 +14,7 @@ String update(String id, String name, int age, double salary);
 
 String getEmployees();
 
-String load(String fileName);
+  String load(String fileName) throws IOException;
 
-String save(String fileName);
+String save(String fileName) throws IOException;
 }

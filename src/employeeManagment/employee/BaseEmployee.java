@@ -33,7 +33,7 @@ public abstract class BaseEmployee implements EmployeeInterface{
 
     private void setAge(int age){
         if (age<=0){
-            throw new IllegalArgumentException("Age cannot be negative ot zero!");
+            throw new IllegalArgumentException("Age cannot be negative or zero!");
         }
         this.age=age;
     }
@@ -61,4 +61,16 @@ public abstract class BaseEmployee implements EmployeeInterface{
         }
         this.id=id;
     }
+
+    @Override
+    public String toString() {
+        return String.format("Employee ID: %s, Name: %s, Age: %d, Salary: %.2f",getId() , getName(), getAge(), getSalary());
+    }
+    @Override
+    public void update(String name, int age, double salary) {
+        setName(name);
+        setAge(age);
+        setSalary(salary);
+    }
+
 }
