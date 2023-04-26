@@ -28,7 +28,10 @@ public class EngineImpl implements Engine {
         if (result.equals("Exit")) {
           break;
         }
-      } catch (NullPointerException | IllegalArgumentException | IllegalStateException | IOException e) {
+      } catch (NullPointerException
+          | IllegalArgumentException
+          | IllegalStateException
+          | IOException e) {
         result = e.getMessage();
       }
       System.out.println(result);
@@ -179,7 +182,8 @@ public class EngineImpl implements Engine {
     }
     return result;
   }
-  private String executeCommandExit(){
+
+  private String executeCommandExit() {
     return "Exit";
   }
 }

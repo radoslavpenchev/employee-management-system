@@ -2,12 +2,12 @@ package employeeManagment.repositories;
 
 import java.util.Map;
 
-public interface Repository<T>{
-Map<String, T> getCollection();
-    void add(String id,T entity);
+public interface Repository<T> {
+  Map<String, T> getCollection();
 
-    T get(String id);
+  void add(String id, T entity);
 
-    boolean remove (String id);
+  T get(String id);
 
+  boolean remove(String id);
 }

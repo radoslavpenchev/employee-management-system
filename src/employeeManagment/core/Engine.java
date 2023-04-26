@@ -1,5 +1,3 @@
 package employeeManagment.core;
 
-public interface Engine extends Runnable{
-
-}
+public interface Engine extends Runnable {}

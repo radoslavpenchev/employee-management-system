@@ -1,5 +1,6 @@
 package employeeManagment.core;
 
+import employeeManagment.additional.Constants;
 import employeeManagment.employee.Employee;
 import employeeManagment.repositories.EmployeeRepository;
 import java.io.*;
@@ -8,12 +9,6 @@ import java.util.List;
 
 public class ControllerImpl implements Controller {
   private EmployeeRepository employeeRepository;
-  private static final String EMPLOYEE_CREATED_MASSAGE = "Employee with ID %s successfully created!";
-  private static final String EMPLOYEE_DELETED_MASSAGE = "Employee with ID %s successfully deleted!";
-  private static final String EMPLOYEE_NOT_FOUND_MASSAGE = "Employee with ID %s was not found!";
-  private static final String EMPLOYEE_UPDATED_MASSAGE = "Employee with ID %s was updated successfully!";
-  private static final String EMPLOYEES_SAVED_MASSAGE = "Employees data saved successfully in %s!";
-  private static final String EMPLOYEES_LOADED_MASSAGE = "Employees successfully loaded from %s!";
 
   public ControllerImpl() {
     this.employeeRepository = new EmployeeRepository();
@@ -23,7 +18,7 @@ public class ControllerImpl implements Controller {
   public String create(String id, String name, int age, double salary) {
     Employee employee = new Employee(id, name, age, salary);
     this.employeeRepository.add(id, employee);
-    return String.format(EMPLOYEE_CREATED_MASSAGE, id);
+    return String.format(Constants.EMPLOYEE_CREATED_MASSAGE, id);
   }
 
   @Override
@@ -34,11 +29,10 @@ public class ControllerImpl implements Controller {
 
   @Override
   public String delete(String id) {
-    if (employeeRepository.remove(id)) {
-      return String.format(EMPLOYEE_DELETED_MASSAGE, id);
-    } else {
-      throw new IllegalArgumentException(String.format(EMPLOYEE_NOT_FOUND_MASSAGE, id));
+    if (!employeeRepository.remove(id)) {
+      throw new IllegalArgumentException(String.format(Constants.EMPLOYEE_NOT_FOUND_MASSAGE, id));
     }
+    return String.format(Constants.EMPLOYEE_DELETED_MASSAGE, id);
   }
 
   @Override
@@ -46,18 +40,16 @@ public class ControllerImpl implements Controller {
     for (String employeeId : this.employeeRepository.getCollection().keySet()) {
       if (employeeId.equals(id)) {
         this.employeeRepository.getCollection().get(id).update(name, age, salary);
-        return String.format(EMPLOYEE_UPDATED_MASSAGE, id);
+        return String.format(Constants.EMPLOYEE_UPDATED_MASSAGE, id);
       }
     }
-    return String.format(EMPLOYEE_NOT_FOUND_MASSAGE, id);
+    return String.format(Constants.EMPLOYEE_NOT_FOUND_MASSAGE, id);
   }
 
   @Override
   public String getEmployees() {
     StringBuilder sb = new StringBuilder();
-    this.employeeRepository
-        .getCollection()
-        .forEach((key, value) -> sb.append(value.toString()).append(System.lineSeparator()));
+    this.employeeRepository.getCollection().forEach((key, value) -> sb.append(value.toString()));
     return sb.toString();
   }
 
@@ -67,7 +59,7 @@ public class ControllerImpl implements Controller {
     List<Employee> employeesToAdd = processEmployees(reader);
     parseEmployees(employeesToAdd);
     reader.close();
-    return String.format(EMPLOYEES_LOADED_MASSAGE,fileName);
+    return String.format(Constants.EMPLOYEES_LOADED_MASSAGE, fileName);
   }
 
   private void parseEmployees(List<Employee> employeesToAdd) {
@@ -79,10 +71,15 @@ public class ControllerImpl implements Controller {
   private List<Employee> processEmployees(BufferedReader reader) throws IOException {
     List<Employee> result = new ArrayList<>();
     String[] header = reader.readLine().split(",");
-    String line ="";
-    while ((line=reader.readLine()) != null){
+    String line = "";
+    while ((line = reader.readLine()) != null) {
       String[] employeeArguments = line.split(",");
-      Employee employeeToAdd = new Employee(employeeArguments[0], employeeArguments[1], Integer.parseInt(employeeArguments[2]), Double.parseDouble(employeeArguments[3]));
+      Employee employeeToAdd =
+          new Employee(
+              employeeArguments[0],
+              employeeArguments[1],
+              Integer.parseInt(employeeArguments[2]),
+              Double.parseDouble(employeeArguments[3]));
       result.add(employeeToAdd);
     }
     reader.close();
@@ -99,7 +96,7 @@ public class ControllerImpl implements Controller {
       writeLine(out, employee);
     }
     out.close();
-    return String.format(EMPLOYEES_SAVED_MASSAGE, csvFile);
+    return String.format(Constants.EMPLOYEES_SAVED_MASSAGE, csvFile);
   }
 
   private List<Employee> getData() {
