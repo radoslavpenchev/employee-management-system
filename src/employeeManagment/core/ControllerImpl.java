@@ -23,7 +23,7 @@ public class ControllerImpl implements Controller {
   }
 
   @Override
-  public String delete(String id) {
+  public String delete(String id) throws MissingEntryError {
     return employeeService.delete(id);
   }
 

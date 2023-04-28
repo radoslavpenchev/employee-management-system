@@ -46,4 +46,13 @@ public class EmployeeRepository implements Repository<Employee> {
     }
     return false;
   }
+  public String update(String id, String name, int age, double salary) {
+    for (String employeeId : this.employees.keySet()) {
+      if (employeeId.equals(id)) {
+        this.employees.get(id).update(name, age, salary);
+        return String.format(Constants.EMPLOYEE_UPDATED_MASSAGE, id);
+      }
+    }
+    return String.format(Constants.EMPLOYEE_NOT_FOUND_MASSAGE, id);
+  }
 }

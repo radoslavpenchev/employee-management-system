@@ -1,6 +1,8 @@
 package employeeManagment.core;
 
+import employeeManagment.additional.Constants;
 import employeeManagment.exceptions.DuplicateEntryError;
+import employeeManagment.exceptions.MissingEntryError;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -33,7 +35,8 @@ public class EngineImpl implements Engine {
           | IllegalArgumentException
           | IllegalStateException
           | IOException
-          | DuplicateEntryError e) {
+          | DuplicateEntryError
+          | MissingEntryError e) {
         result = e.getMessage();
       }
       System.out.println(result);
@@ -41,7 +44,7 @@ public class EngineImpl implements Engine {
   }
 
   // Reading, Validating and Processing input
-  private String processInput() throws IOException, DuplicateEntryError {
+  private String processInput() throws IOException, DuplicateEntryError, MissingEntryError {
     Pair<String, List<String>> pair = parseInput(reader);
     return dispatchCommand(pair.getLeft(), pair.getRight());
   }
@@ -52,12 +55,12 @@ public class EngineImpl implements Engine {
   }
 
   // GET EMPLOYEE
-  private String get(String id) {
+  private String get(String id) throws MissingEntryError {
     return controller.get(id);
   }
 
   // DELETE
-  private String delete(String id) {
+  private String delete(String id) throws MissingEntryError {
     return controller.delete(id);
   }
 
@@ -77,7 +80,7 @@ public class EngineImpl implements Engine {
   }
 
   // SAVE to csv
-  private String save(String fileName) throws IOException {
+  private String save(String fileName) throws IOException, MissingEntryError {
     return controller.save(fileName);
   }
 
@@ -99,7 +102,7 @@ public class EngineImpl implements Engine {
 
   // Processing command with arguments
   private String dispatchCommand(String command, List<String> arguments)
-      throws IOException, DuplicateEntryError {
+      throws IOException, DuplicateEntryError, MissingEntryError {
     switch (command) {
       case "create":
         return executeCommandCreate(arguments);
@@ -132,7 +135,7 @@ public class EngineImpl implements Engine {
     return result;
   }
 
-  private String executeCommandGet(List<String> arguments) {
+  private String executeCommandGet(List<String> arguments) throws MissingEntryError {
     String result = null;
     if (arguments.get(0).equals("employee")) {
       if (validateArgsLength(2, arguments)) {
@@ -144,10 +147,13 @@ public class EngineImpl implements Engine {
         result = getEmployees();
       }
     }
+    if (result.isEmpty()){
+      return Constants.EMPLOYEES_NOT_FOUND_MASSAGE;
+    }
     return result;
   }
 
-  private String executeCommandDelete(List<String> arguments) {
+  private String executeCommandDelete(List<String> arguments) throws MissingEntryError {
     String result = null;
     if (validateArgsLength(2, arguments)) {
       String idToDelete = arguments.get(1);
@@ -178,7 +184,7 @@ public class EngineImpl implements Engine {
     return result;
   }
 
-  private String executeCommandSave(List<String> arguments) throws IOException {
+  private String executeCommandSave(List<String> arguments) throws IOException, MissingEntryError {
     String result = null;
     if (validateArgsLength(2, arguments)) {
       String savingFileName = arguments.get(1);

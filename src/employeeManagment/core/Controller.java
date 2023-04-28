@@ -6,11 +6,11 @@ import employeeManagment.exceptions.MissingEntryError;
 import java.io.IOException;
 
 public interface Controller {
-  String create(String id, String name, int age, double salary) throws DuplicateEntryError, DuplicateEntryError;
+  String create(String id, String name, int age, double salary) throws DuplicateEntryError;
 
   String get(String id) throws MissingEntryError;
 
-  String delete(String id);
+  String delete(String id) throws MissingEntryError;
 
   String update(String id, String name, int age, double salary);
 
