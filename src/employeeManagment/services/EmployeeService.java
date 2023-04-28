@@ -3,8 +3,9 @@ package employeeManagment.services;
 import employeeManagment.additional.Constants;
 import employeeManagment.core.Controller;
 import employeeManagment.employee.Employee;
+import employeeManagment.exceptions.DuplicateEntryError;
+import employeeManagment.exceptions.MissingEntryError;
 import employeeManagment.repositories.EmployeeRepository;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,13 +18,13 @@ public class EmployeeService implements Controller {
     }
 
     @Override
-    public String create(String id, String name, int age, double salary) {
+    public String create(String id, String name, int age, double salary) throws DuplicateEntryError {
         Employee employee = new Employee(id, name, age, salary);
         this.employeeRepository.add(id, employee);
         return String.format(Constants.EMPLOYEE_CREATED_MASSAGE, id);    }
 
     @Override
-    public String get(String id) {
+    public String get(String id) throws MissingEntryError {
         Employee employee = employeeRepository.get(id);
         return employee.toString();
     }
@@ -53,8 +54,8 @@ public class EmployeeService implements Controller {
         return sb.toString();
     }
 
-    @Override
-    public String load(String fileName) throws IOException {
+  @Override
+  public String load(String fileName) throws IOException, DuplicateEntryError {
         BufferedReader reader = new BufferedReader(new FileReader(fileName));
         List<Employee> employeesToAdd = processEmployees(reader);
         parseEmployees(employeesToAdd);
@@ -62,7 +63,7 @@ public class EmployeeService implements Controller {
         return String.format(Constants.EMPLOYEES_LOADED_MASSAGE, fileName);
     }
 
-    private void parseEmployees(List<Employee> employeesToAdd) {
+    private void parseEmployees(List<Employee> employeesToAdd) throws DuplicateEntryError {
         for (Employee employee : employeesToAdd) {
             this.employeeRepository.add(employee.getId(), employee);
         }
@@ -86,8 +87,8 @@ public class EmployeeService implements Controller {
         return result;
     }
 
-    @Override
-    public String save(String fileName) throws IOException {
+  @Override
+  public String save(String fileName) throws IOException, MissingEntryError {
         File csvFile = new File(fileName);
         PrintWriter out = new PrintWriter(csvFile);
         List<Employee> employeesOutputData = getData();
@@ -98,7 +99,7 @@ public class EmployeeService implements Controller {
         out.close();
         return String.format(Constants.EMPLOYEES_SAVED_MASSAGE, csvFile);
     }
-    private List<Employee> getData() {
+    private List<Employee> getData() throws MissingEntryError {
         List<Employee> employeesData = new ArrayList<>();
         for (String id : this.employeeRepository.getCollection().keySet()) {
             employeesData.add(this.employeeRepository.get(id));

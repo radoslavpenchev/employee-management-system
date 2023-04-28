@@ -1,6 +1,9 @@
 package employeeManagment.repositories;
 
+import employeeManagment.additional.Constants;
 import employeeManagment.employee.Employee;
+import employeeManagment.exceptions.DuplicateEntryError;
+import employeeManagment.exceptions.MissingEntryError;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -18,17 +21,17 @@ public class EmployeeRepository implements Repository<Employee> {
   }
 
   @Override
-  public void add(String id, Employee employee) {
+  public void add(String id, Employee employee) throws DuplicateEntryError {
     if (this.employees.containsKey(id)) {
-      throw new IllegalStateException("There is an employee with the same ID in the system!");
+      throw new DuplicateEntryError(String.format(Constants.EMPLOYEE_ALREADY_CREATED_MASSAGE,id));
     }
     this.employees.put(id, employee);
   }
 
   @Override
-  public Employee get(String id) {
+  public Employee get(String id) throws MissingEntryError {
     if (!this.employees.containsKey(id)) {
-      throw new IllegalStateException("There is no employee matching the ID in the system!");
+      throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MASSAGE,id));
     }
     return this.employees.get(id);
   }

@@ -1,5 +1,7 @@
 package employeeManagment.core;
 
+import employeeManagment.exceptions.DuplicateEntryError;
+import employeeManagment.exceptions.MissingEntryError;
 import employeeManagment.services.EmployeeService;
 import java.io.*;
 
@@ -11,12 +13,12 @@ public class ControllerImpl implements Controller {
   }
 
   @Override
-  public String create(String id, String name, int age, double salary) {
+  public String create(String id, String name, int age, double salary) throws DuplicateEntryError {
     return employeeService.create(id, name, age, salary);
   }
 
   @Override
-  public String get(String id) {
+  public String get(String id) throws MissingEntryError {
     return employeeService.get(id);
   }
 
@@ -36,12 +38,12 @@ public class ControllerImpl implements Controller {
   }
 
   @Override
-  public String load(String fileName) throws IOException {
+  public String load(String fileName) throws IOException, DuplicateEntryError {
     return employeeService.load(fileName);
   }
 
   @Override
-  public String save(String fileName) throws IOException {
+  public String save(String fileName) throws IOException, MissingEntryError {
     return employeeService.save(fileName);
   }
 }

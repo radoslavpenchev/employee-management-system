@@ -1,5 +1,6 @@
 package employeeManagment.core;
 
+import employeeManagment.exceptions.DuplicateEntryError;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -31,7 +32,8 @@ public class EngineImpl implements Engine {
       } catch (NullPointerException
           | IllegalArgumentException
           | IllegalStateException
-          | IOException e) {
+          | IOException
+          | DuplicateEntryError e) {
         result = e.getMessage();
       }
       System.out.println(result);
@@ -39,13 +41,13 @@ public class EngineImpl implements Engine {
   }
 
   // Reading, Validating and Processing input
-  private String processInput() throws IOException {
+  private String processInput() throws IOException, DuplicateEntryError {
     Pair<String, List<String>> pair = parseInput(reader);
     return dispatchCommand(pair.getLeft(), pair.getRight());
   }
 
   // CREATE
-  private String create(String id, String name, int age, double salary) {
+  private String create(String id, String name, int age, double salary) throws DuplicateEntryError {
     return controller.create(id, name, age, salary);
   }
 
@@ -70,7 +72,7 @@ public class EngineImpl implements Engine {
   }
 
   // LOAD to csv
-  private String load(String fileName) throws IOException {
+  private String load(String fileName) throws IOException, DuplicateEntryError {
     return controller.load(fileName);
   }
 
@@ -96,7 +98,8 @@ public class EngineImpl implements Engine {
   }
 
   // Processing command with arguments
-  private String dispatchCommand(String command, List<String> arguments) throws IOException {
+  private String dispatchCommand(String command, List<String> arguments)
+      throws IOException, DuplicateEntryError {
     switch (command) {
       case "create":
         return executeCommandCreate(arguments);
@@ -117,7 +120,7 @@ public class EngineImpl implements Engine {
     }
   }
 
-  private String executeCommandCreate(List<String> arguments) {
+  private String executeCommandCreate(List<String> arguments) throws DuplicateEntryError {
     String result = null;
     if (validateArgsLength(5, arguments)) {
       String id = arguments.get(1);
@@ -165,7 +168,8 @@ public class EngineImpl implements Engine {
     return result;
   }
 
-  private String executeCommandLoad(List<String> arguments) throws IOException {
+  private String executeCommandLoad(List<String> arguments)
+      throws IOException, DuplicateEntryError {
     String result = null;
     if (validateArgsLength(2, arguments)) {
       String loadingFileName = arguments.get(1);
