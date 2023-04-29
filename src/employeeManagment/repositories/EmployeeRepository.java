@@ -4,8 +4,9 @@ import employeeManagment.additional.Constants;
 import employeeManagment.employee.Employee;
 import employeeManagment.exceptions.DuplicateEntryError;
 import employeeManagment.exceptions.MissingEntryError;
-
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EmployeeRepository implements Repository<Employee> {
@@ -23,7 +24,7 @@ public class EmployeeRepository implements Repository<Employee> {
   @Override
   public void add(String id, Employee employee) throws DuplicateEntryError {
     if (this.employees.containsKey(id)) {
-      throw new DuplicateEntryError(String.format(Constants.EMPLOYEE_ALREADY_CREATED_MASSAGE,id));
+      throw new DuplicateEntryError(String.format(Constants.EMPLOYEE_ALREADY_CREATED_MASSAGE, id));
     }
     this.employees.put(id, employee);
   }
@@ -31,21 +32,22 @@ public class EmployeeRepository implements Repository<Employee> {
   @Override
   public Employee get(String id) throws MissingEntryError {
     if (!this.employees.containsKey(id)) {
-      throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MASSAGE,id));
+      throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MASSAGE, id));
     }
     return this.employees.get(id);
   }
 
   @Override
-  public boolean remove(String id) {
+  public String remove(String id) throws MissingEntryError {
     for (String employeeId : this.employees.keySet()) {
       if (employeeId.equals(id)) {
         this.employees.remove(employeeId);
-        return true;
+        return String.format(Constants.EMPLOYEE_DELETED_MASSAGE, id);
       }
     }
-    return false;
+    throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MASSAGE, id));
   }
+
   public String update(String id, String name, int age, double salary) {
     for (String employeeId : this.employees.keySet()) {
       if (employeeId.equals(id)) {
@@ -54,5 +56,10 @@ public class EmployeeRepository implements Repository<Employee> {
       }
     }
     return String.format(Constants.EMPLOYEE_NOT_FOUND_MASSAGE, id);
+  }
+
+  public List<Employee> getAll(){
+    List<Employee> employeesList= new ArrayList<>(this.employees.values());
+    return employeesList;
   }
 }

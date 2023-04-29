@@ -12,5 +12,5 @@ public interface Repository<T> {
 
   T get(String id) throws MissingEntryError;
 
-  boolean remove(String id);
+  String remove(String id) throws MissingEntryError;
 }

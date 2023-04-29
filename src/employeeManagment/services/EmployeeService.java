@@ -32,10 +32,8 @@ public class EmployeeService implements Controller {
 
   @Override
   public String delete(String id) throws MissingEntryError {
-    if (!employeeRepository.remove(id)) {
-      throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MASSAGE, id));
-    }
-    return String.format(Constants.EMPLOYEE_DELETED_MASSAGE, id);
+
+    return employeeRepository.remove(id);
   }
 
   @Override
@@ -84,7 +82,7 @@ public class EmployeeService implements Controller {
   }
 
   @Override
-  public String save(String fileName) throws IOException, MissingEntryError {
+  public String save(String fileName) throws IOException {
     File csvFile = new File(fileName);
     PrintWriter out = new PrintWriter(csvFile);
     List<Employee> employeesOutputData = getData();
@@ -96,19 +94,15 @@ public class EmployeeService implements Controller {
     return String.format(Constants.EMPLOYEES_SAVED_MASSAGE, csvFile);
   }
 
-  private List<Employee> getData() throws MissingEntryError {
-    List<Employee> employeesData = new ArrayList<>();
-    for (String id : this.employeeRepository.getCollection().keySet()) {
-      employeesData.add(this.employeeRepository.get(id));
-    }
-    return employeesData;
+  private List<Employee> getData() {
+    return new ArrayList<>(this.employeeRepository.getAll());
   }
 
-  private void writeHeader(PrintWriter writer) throws IOException {
+  private void writeHeader(PrintWriter writer) {
     writer.println("ID,Name,Age,Salary");
   }
 
-  private void writeLine(PrintWriter writer, Employee employee) throws IOException {
+  private void writeLine(PrintWriter writer, Employee employee) {
     StringBuilder sb = new StringBuilder();
     sb.append(employee.getId())
         .append(",")
