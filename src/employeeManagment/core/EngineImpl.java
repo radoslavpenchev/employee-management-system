@@ -12,8 +12,8 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public class EngineImpl implements Engine {
 
-  private Controller controller;
-  private BufferedReader reader;
+  private final Controller controller;
+  private final BufferedReader reader;
 
   public EngineImpl(Controller controller) {
     this.controller = controller;
@@ -24,7 +24,7 @@ public class EngineImpl implements Engine {
   @Override
   public void run() {
     while (true) {
-      String result = null;
+      String result;
       try {
         result = processInput();
 
@@ -65,7 +65,7 @@ public class EngineImpl implements Engine {
   }
 
   // UPDATE
-  private String update(String id, String name, int age, double salary) {
+  private String update(String id, String name, int age, double salary) throws MissingEntryError {
     return controller.update(id, name, age, salary);
   }
 
@@ -80,7 +80,7 @@ public class EngineImpl implements Engine {
   }
 
   // SAVE to csv
-  private String save(String fileName) throws IOException, MissingEntryError {
+  private String save(String fileName) throws IOException {
     return controller.save(fileName);
   }
 
@@ -147,8 +147,8 @@ public class EngineImpl implements Engine {
         result = getEmployees();
       }
     }
-    if (result.isEmpty()){
-      return Constants.EMPLOYEES_NOT_FOUND_MASSAGE;
+    if (result.isEmpty()) {
+      return Constants.EMPLOYEES_NOT_FOUND_MESSAGE;
     }
     return result;
   }
@@ -162,7 +162,7 @@ public class EngineImpl implements Engine {
     return result;
   }
 
-  private String executeCommandUpdate(List<String> arguments) {
+  private String executeCommandUpdate(List<String> arguments) throws MissingEntryError {
     String result = null;
     if (validateArgsLength(5, arguments)) {
       String idToUpdate = arguments.get(1);
@@ -184,7 +184,7 @@ public class EngineImpl implements Engine {
     return result;
   }
 
-  private String executeCommandSave(List<String> arguments) throws IOException, MissingEntryError {
+  private String executeCommandSave(List<String> arguments) throws IOException {
     String result = null;
     if (validateArgsLength(2, arguments)) {
       String savingFileName = arguments.get(1);

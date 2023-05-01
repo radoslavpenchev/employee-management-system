@@ -12,11 +12,11 @@ public interface Controller {
 
   String delete(String id) throws MissingEntryError;
 
-  String update(String id, String name, int age, double salary);
+  String update(String id, String name, int age, double salary) throws MissingEntryError;
 
   String getEmployees();
 
   String load(String fileName) throws IOException, DuplicateEntryError;
 
-  String save(String fileName) throws IOException, MissingEntryError;
+  String save(String fileName) throws IOException;
 }

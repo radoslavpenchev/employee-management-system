@@ -21,7 +21,7 @@ public class EmployeeService implements Controller {
   public String create(String id, String name, int age, double salary) throws DuplicateEntryError {
     Employee employee = new Employee(id, name, age, salary);
     this.employeeRepository.add(id, employee);
-    return String.format(Constants.EMPLOYEE_CREATED_MASSAGE, id);
+    return String.format(Constants.EMPLOYEE_CREATED_MESSAGE, id);
   }
 
   @Override
@@ -32,12 +32,11 @@ public class EmployeeService implements Controller {
 
   @Override
   public String delete(String id) throws MissingEntryError {
-
     return employeeRepository.remove(id);
   }
 
   @Override
-  public String update(String id, String name, int age, double salary) {
+  public String update(String id, String name, int age, double salary) throws MissingEntryError {
     return this.employeeRepository.update(id, name, age, salary);
   }
 
@@ -54,7 +53,7 @@ public class EmployeeService implements Controller {
     List<Employee> employeesToAdd = processEmployees(reader);
     parseEmployees(employeesToAdd);
     reader.close();
-    return String.format(Constants.EMPLOYEES_LOADED_MASSAGE, fileName);
+    return String.format(Constants.EMPLOYEES_LOADED_MESSAGE, fileName);
   }
 
   private void parseEmployees(List<Employee> employeesToAdd) throws DuplicateEntryError {
@@ -91,7 +90,7 @@ public class EmployeeService implements Controller {
       writeLine(out, employee);
     }
     out.close();
-    return String.format(Constants.EMPLOYEES_SAVED_MASSAGE, csvFile);
+    return String.format(Constants.EMPLOYEES_SAVED_MESSAGE, csvFile);
   }
 
   private List<Employee> getData() {

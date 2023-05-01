@@ -24,7 +24,7 @@ public class EmployeeRepository implements Repository<Employee> {
   @Override
   public void add(String id, Employee employee) throws DuplicateEntryError {
     if (this.employees.containsKey(id)) {
-      throw new DuplicateEntryError(String.format(Constants.EMPLOYEE_ALREADY_CREATED_MASSAGE, id));
+      throw new DuplicateEntryError(String.format(Constants.EMPLOYEE_ALREADY_CREATED_MESSAGE, id));
     }
     this.employees.put(id, employee);
   }
@@ -32,7 +32,7 @@ public class EmployeeRepository implements Repository<Employee> {
   @Override
   public Employee get(String id) throws MissingEntryError {
     if (!this.employees.containsKey(id)) {
-      throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MASSAGE, id));
+      throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MESSAGE, id));
     }
     return this.employees.get(id);
   }
@@ -42,24 +42,24 @@ public class EmployeeRepository implements Repository<Employee> {
     for (String employeeId : this.employees.keySet()) {
       if (employeeId.equals(id)) {
         this.employees.remove(employeeId);
-        return String.format(Constants.EMPLOYEE_DELETED_MASSAGE, id);
+        return String.format(Constants.EMPLOYEE_DELETED_MESSAGE, id);
       }
     }
-    throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MASSAGE, id));
+    throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MESSAGE, id));
   }
 
-  public String update(String id, String name, int age, double salary) {
+  public String update(String id, String name, int age, double salary) throws MissingEntryError {
     for (String employeeId : this.employees.keySet()) {
       if (employeeId.equals(id)) {
         this.employees.get(id).update(name, age, salary);
-        return String.format(Constants.EMPLOYEE_UPDATED_MASSAGE, id);
+        return String.format(Constants.EMPLOYEE_UPDATED_MESSAGE, id);
       }
     }
-    return String.format(Constants.EMPLOYEE_NOT_FOUND_MASSAGE, id);
+    throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MESSAGE, id));
   }
 
-  public List<Employee> getAll(){
-    List<Employee> employeesList= new ArrayList<>(this.employees.values());
+  public List<Employee> getAll() {
+    List<Employee> employeesList = new ArrayList<>(this.employees.values());
     return employeesList;
   }
 }

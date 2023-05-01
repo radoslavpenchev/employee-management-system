@@ -6,7 +6,7 @@ import employeeManagment.services.EmployeeService;
 import java.io.*;
 
 public class ControllerImpl implements Controller {
-  private EmployeeService employeeService;
+  private final EmployeeService employeeService;
 
   public ControllerImpl() {
     this.employeeService = new EmployeeService();
@@ -28,7 +28,7 @@ public class ControllerImpl implements Controller {
   }
 
   @Override
-  public String update(String id, String name, int age, double salary) {
+  public String update(String id, String name, int age, double salary) throws MissingEntryError {
     return employeeService.update(id, name, age, salary);
   }
 
@@ -43,7 +43,7 @@ public class ControllerImpl implements Controller {
   }
 
   @Override
-  public String save(String fileName) throws IOException, MissingEntryError {
+  public String save(String fileName) throws IOException {
     return employeeService.save(fileName);
   }
 }
