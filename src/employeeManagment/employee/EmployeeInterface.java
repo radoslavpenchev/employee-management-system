@@ -1,13 +1,13 @@
 package employeeManagment.employee;
 
 public interface EmployeeInterface {
-    String getName();
+  String getName();
 
-    int getAge();
+  int getAge();
 
-    double getSalary();
+  double getSalary();
 
-    String getId();
+  String getId();
 
-
+  void update(String name, int age, double salary);
 }

@@ -1,13 +1,16 @@
 package employeeManagment.repositories;
 
+import employeeManagment.exceptions.DuplicateEntryError;
+import employeeManagment.exceptions.MissingEntryError;
+
 import java.util.Map;
 
 public interface Repository<T> {
-Map<String, T> getCollection();
-    void add(String id,T entity);
+  Map<String, T> getCollection();
 
-    T get(String id);
+  void add(String id, T entity) throws DuplicateEntryError, DuplicateEntryError;
 
-    boolean remove (String id);
+  T get(String id) throws MissingEntryError;
 
+  String remove(String id) throws MissingEntryError;
 }

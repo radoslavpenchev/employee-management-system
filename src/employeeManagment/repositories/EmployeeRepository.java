@@ -1,51 +1,65 @@
 package employeeManagment.repositories;
 
+import employeeManagment.additional.Constants;
 import employeeManagment.employee.Employee;
-
+import employeeManagment.exceptions.DuplicateEntryError;
+import employeeManagment.exceptions.MissingEntryError;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class EmployeeRepository implements Repository<Employee> {
-    private Map<String, Employee> employees;
+  private Map<String, Employee> employees;
 
-    public EmployeeRepository(){
-        this.employees=new LinkedHashMap<>();
+  public EmployeeRepository() {
+    this.employees = new LinkedHashMap<>();
+  }
+
+  @Override
+  public Map<String, Employee> getCollection() {
+    return this.employees;
+  }
+
+  @Override
+  public void add(String id, Employee employee) throws DuplicateEntryError {
+    if (this.employees.containsKey(id)) {
+      throw new DuplicateEntryError(String.format(Constants.EMPLOYEE_ALREADY_CREATED_MESSAGE, id));
     }
+    this.employees.put(id, employee);
+  }
 
-
-    @Override
-    public Map<String, Employee> getCollection() {
-        return this.employees;
+  @Override
+  public Employee get(String id) throws MissingEntryError {
+    if (!this.employees.containsKey(id)) {
+      throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MESSAGE, id));
     }
+    return this.employees.get(id);
+  }
 
-    @Override
-    public void add(String id, Employee employee) {
-        if (this.employees.containsKey(id)){
-            throw new IllegalStateException("There is an employee with the same ID in the system!");
-        }
-
-        this.employees.put(id,employee);
+  @Override
+  public String remove(String id) throws MissingEntryError {
+    for (String employeeId : this.employees.keySet()) {
+      if (employeeId.equals(id)) {
+        this.employees.remove(employeeId);
+        return String.format(Constants.EMPLOYEE_DELETED_MESSAGE, id);
+      }
     }
+    throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MESSAGE, id));
+  }
 
-
-    @Override
-    public Employee get(String id) {
-        if (!this.employees.containsKey(id)){
-            throw new IllegalStateException("There is no employee matching the ID in the system!");
-        }
-        return this.employees.get(id);
+  public String update(String id, String name, int age, double salary) throws MissingEntryError {
+    for (String employeeId : this.employees.keySet()) {
+      if (employeeId.equals(id)) {
+        this.employees.get(id).update(name, age, salary);
+        return String.format(Constants.EMPLOYEE_UPDATED_MESSAGE, id);
+      }
     }
+    throw new MissingEntryError(String.format(Constants.EMPLOYEE_NOT_FOUND_MESSAGE, id));
+  }
 
-    @Override
-    public boolean remove(String id) {
-        for (String employeeId : this.employees.keySet()) {
-            if (employeeId.equals(id)){
-                this.employees.remove(employeeId);
-                return true;
-            }
-        }
-        return false;
-    }
-
-
+  public List<Employee> getAll() {
+    List<Employee> employeesList = new ArrayList<>(this.employees.values());
+    return employeesList;
+  }
 }

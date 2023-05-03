@@ -1,16 +1,19 @@
 package employeeManagment.core;
 
-import org.apache.commons.lang3.tuple.Pair;
-
+import employeeManagment.additional.Constants;
+import employeeManagment.exceptions.DuplicateEntryError;
+import employeeManagment.exceptions.MissingEntryError;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class EngineImpl implements Engine {
 
-  private Controller controller;
-  private BufferedReader reader;
+  private final Controller controller;
+  private final BufferedReader reader;
 
   public EngineImpl(Controller controller) {
     this.controller = controller;
@@ -21,14 +24,19 @@ public class EngineImpl implements Engine {
   @Override
   public void run() {
     while (true) {
-      String result = null;
+      String result;
       try {
         result = processInput();
 
         if (result.equals("Exit")) {
           break;
         }
-      } catch (NullPointerException | IllegalArgumentException | IOException e) {
+      } catch (NullPointerException
+          | IllegalArgumentException
+          | IllegalStateException
+          | IOException
+          | DuplicateEntryError
+          | MissingEntryError e) {
         result = e.getMessage();
       }
       System.out.println(result);
@@ -36,28 +44,28 @@ public class EngineImpl implements Engine {
   }
 
   // Reading, Validating and Processing input
-  private String processInput() throws IOException {
+  private String processInput() throws IOException, DuplicateEntryError, MissingEntryError {
     Pair<String, List<String>> pair = parseInput(reader);
     return dispatchCommand(pair.getLeft(), pair.getRight());
   }
 
   // CREATE
-  private String create(String id, String name, int age, double salary) {
+  private String create(String id, String name, int age, double salary) throws DuplicateEntryError {
     return controller.create(id, name, age, salary);
   }
 
   // GET EMPLOYEE
-  private String get(String id) {
+  private String get(String id) throws MissingEntryError {
     return controller.get(id);
   }
 
   // DELETE
-  private String delete(String id) {
+  private String delete(String id) throws MissingEntryError {
     return controller.delete(id);
   }
 
   // UPDATE
-  private String update(String id, String name, int age, double salary) {
+  private String update(String id, String name, int age, double salary) throws MissingEntryError {
     return controller.update(id, name, age, salary);
   }
 
@@ -67,18 +75,18 @@ public class EngineImpl implements Engine {
   }
 
   // LOAD to csv
-  private String load(String fileName) {
+  private String load(String fileName) throws IOException, DuplicateEntryError {
     return controller.load(fileName);
   }
 
   // SAVE to csv
-  private String save(String fileName) {
+  private String save(String fileName) throws IOException {
     return controller.save(fileName);
   }
 
   private Pair<String, List<String>> parseInput(BufferedReader reader) throws IOException {
     String input = reader.readLine();
-    List<String> arguments = Arrays.stream(input.split("\\s+")).toList();
+    List<String> arguments = Arrays.stream(input.split("\\s+")).collect(Collectors.toList());
     String command = arguments.get(0);
     arguments.remove(0);
     return Pair.of(command, arguments);
@@ -93,7 +101,8 @@ public class EngineImpl implements Engine {
   }
 
   // Processing command with arguments
-  private String dispatchCommand(String command, List<String> arguments) {
+  private String dispatchCommand(String command, List<String> arguments)
+      throws IOException, DuplicateEntryError, MissingEntryError {
     switch (command) {
       case "create":
         return executeCommandCreate(arguments);
@@ -107,12 +116,14 @@ public class EngineImpl implements Engine {
         return executeCommandLoad(arguments);
       case "save":
         return executeCommandSave(arguments);
+      case "Exit":
+        return executeCommandExit();
       default:
         throw new IllegalArgumentException("Invalid command!");
     }
   }
 
-  private String executeCommandCreate(List<String> arguments) {
+  private String executeCommandCreate(List<String> arguments) throws DuplicateEntryError {
     String result = null;
     if (validateArgsLength(5, arguments)) {
       String id = arguments.get(1);
@@ -124,7 +135,7 @@ public class EngineImpl implements Engine {
     return result;
   }
 
-  private String executeCommandGet(List<String> arguments) {
+  private String executeCommandGet(List<String> arguments) throws MissingEntryError {
     String result = null;
     if (arguments.get(0).equals("employee")) {
       if (validateArgsLength(2, arguments)) {
@@ -136,10 +147,13 @@ public class EngineImpl implements Engine {
         result = getEmployees();
       }
     }
+    if (result.isEmpty()) {
+      return Constants.EMPLOYEES_NOT_FOUND_MESSAGE;
+    }
     return result;
   }
 
-  private String executeCommandDelete(List<String> arguments) {
+  private String executeCommandDelete(List<String> arguments) throws MissingEntryError {
     String result = null;
     if (validateArgsLength(2, arguments)) {
       String idToDelete = arguments.get(1);
@@ -148,7 +162,7 @@ public class EngineImpl implements Engine {
     return result;
   }
 
-  private String executeCommandUpdate(List<String> arguments) {
+  private String executeCommandUpdate(List<String> arguments) throws MissingEntryError {
     String result = null;
     if (validateArgsLength(5, arguments)) {
       String idToUpdate = arguments.get(1);
@@ -160,7 +174,8 @@ public class EngineImpl implements Engine {
     return result;
   }
 
-  private String executeCommandLoad(List<String> arguments) {
+  private String executeCommandLoad(List<String> arguments)
+      throws IOException, DuplicateEntryError {
     String result = null;
     if (validateArgsLength(2, arguments)) {
       String loadingFileName = arguments.get(1);
@@ -169,12 +184,16 @@ public class EngineImpl implements Engine {
     return result;
   }
 
-  private String executeCommandSave(List<String> arguments) {
+  private String executeCommandSave(List<String> arguments) throws IOException {
     String result = null;
     if (validateArgsLength(2, arguments)) {
       String savingFileName = arguments.get(1);
       result = save(savingFileName);
     }
     return result;
+  }
+
+  private String executeCommandExit() {
+    return "Exit";
   }
 }
